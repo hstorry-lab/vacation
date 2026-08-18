@@ -868,7 +868,7 @@ function showCalTooltip(e, dateStr) {
     ${people.map(p => `
       <div class="cal-tip-person">
         <span class="cal-dot cal-dot-${p.status}"></span>
-        ${p.name}<span class="cal-tip-status"> · ${labels[p.status]}</span>
+        ${p.name} <span class="cal-tip-status">· ${p.type} · ${labels[p.status]}</span>
       </div>
     `).join('')}
   `;
@@ -910,7 +910,7 @@ function onCalCellClick(e, dateStr) {
       <div class="cal-day-info-row">
         <span class="cal-dot cal-dot-${p.status}"></span>
         <span>${p.name}</span>
-        <span class="cal-tip-status" style="margin-left:auto">${labels[p.status]}</span>
+        <span class="cal-tip-status" style="margin-left:auto">${p.type} · ${labels[p.status]}</span>
       </div>
     `).join('')}
   `;
