@@ -298,6 +298,29 @@
   .cal-search-type  { color: var(--muted); }
   .cal-no-result    { font-size: 13px; color: var(--muted); padding: 8px 0; }
 
+  /* ── 캘린더 날짜 클릭 정보 (모바일) ── */
+  .cal-day-info {
+    display: none; margin-top: 12px; padding: 12px 14px;
+    background: var(--bg); border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .cal-day-info.on { display: block; }
+  .cal-day-info-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .cal-day-info-date { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .cal-day-info-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 16px; padding: 2px; line-height: 1;
+  }
+  .cal-day-info-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; font-size: 13px; font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-day-info-row:last-child { border-bottom: none; }
+
   /* ── 캘린더 툴팁 ── */
   #cal-tooltip {
     position: fixed; z-index: 400;
@@ -510,6 +533,7 @@
         <div class="cal-legend-item"><span class="cal-dot cal-dot-approved"></span> 승인</div>
         <div class="cal-legend-item"><span class="cal-dot cal-dot-pending"></span> 대기중</div>
       </div>
+      <div id="cal-day-info" class="cal-day-info"></div>
       <div id="cal-search-results"></div>
     </div>
   </div>
@@ -820,7 +844,8 @@ function renderCalendar() {
     html += `
       <div class="cal-cell ${isToday ? 'today' : ''} ${people.length ? 'has-event' : ''} ${dowClass} ${isSearched ? 'searched' : ''}"
            onmouseenter="showCalTooltip(event,'${dateStr}')"
-           onmouseleave="hideCalTooltip()">
+           onmouseleave="hideCalTooltip()"
+           onclick="onCalCellClick(event,'${dateStr}')">
         <span class="cal-num">${d}</span>
         ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
       </div>
@@ -863,6 +888,38 @@ function showCalTooltip(e, dateStr) {
 
 function hideCalTooltip() {
   document.getElementById('cal-tooltip').classList.remove('on');
+}
+
+function isTouchDevice() {
+  return window.matchMedia('(pointer: coarse)').matches;
+}
+
+function onCalCellClick(e, dateStr) {
+  if (!isTouchDevice()) return; // PC는 mouseenter로 처리
+  const people = getDatePeople(dateStr);
+  const el = document.getElementById('cal-day-info');
+  if (!people.length) { el.classList.remove('on'); return; }
+
+  const labels = { pending: '대기중', approved: '승인', rejected: '반려' };
+  el.innerHTML = `
+    <div class="cal-day-info-header">
+      <span class="cal-day-info-date">${dateStr.replace(/-/g, '.')}</span>
+      <button class="cal-day-info-close" onclick="closeCalDayInfo()">✕</button>
+    </div>
+    ${people.map(p => `
+      <div class="cal-day-info-row">
+        <span class="cal-dot cal-dot-${p.status}"></span>
+        <span>${p.name}</span>
+        <span class="cal-tip-status" style="margin-left:auto">${labels[p.status]}</span>
+      </div>
+    `).join('')}
+  `;
+  el.classList.add('on');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeCalDayInfo() {
+  document.getElementById('cal-day-info').classList.remove('on');
 }
 
 function prevMonth() {
