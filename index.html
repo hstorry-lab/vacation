@@ -204,7 +204,123 @@
   }
   #toast.show { opacity: 1; }
 
+  /* ── 캘린더 ── */
+  .cal-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .cal-month-title { font-size: 15px; font-weight: 600; }
+  .cal-arrow {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border); background: none; cursor: pointer;
+    font-size: 18px; color: var(--text); line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s; font-family: inherit;
+  }
+  .cal-arrow:hover { background: var(--bg); }
+
+  .cal-weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 4px;
+  }
+  .cal-wd {
+    text-align: center; font-size: 11px; font-weight: 600;
+    color: var(--muted); padding: 4px 0;
+  }
+  .cal-wd:first-child { color: #e57373; }
+  .cal-wd:last-child  { color: #5b8fd4; }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+
+  .cal-cell {
+    border-radius: 8px; padding: 4px 2px;
+    display: flex; flex-direction: column; align-items: center;
+    transition: background .15s; min-height: 40px; cursor: default;
+  }
+  .cal-cell.has-event { cursor: pointer; }
+  .cal-cell.has-event:hover { background: var(--bg); }
+
+  .cal-num {
+    font-size: 12px; font-weight: 500;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+  }
+  .cal-cell.sun .cal-num { color: #e57373; }
+  .cal-cell.sat .cal-num { color: #5b8fd4; }
+  .cal-cell.today .cal-num { background: var(--accent); color: #fff !important; }
+
+  .cal-dots { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .cal-dot-approved { background: var(--accent); }
+  .cal-dot-pending  { background: #F59E0B; }
+  .cal-dot-rejected { background: var(--danger); }
+
+  .cal-cell.searched { background: var(--accent-light) !important; border-radius: 8px; }
+  .cal-cell.searched .cal-num { color: var(--accent) !important; font-weight: 700; }
+  .cal-cell.today.searched .cal-num { color: #fff !important; }
+
+  .cal-legend {
+    display: flex; gap: 14px; margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .cal-legend-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; color: var(--muted); font-weight: 500;
+  }
+
+  /* ── 캘린더 검색 ── */
+  .cal-search {
+    position: relative; margin-bottom: 14px;
+  }
+  .cal-search-input {
+    width: 100%; height: 40px; padding: 0 36px 0 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    font-size: 13px; font-family: inherit;
+    background: var(--bg); color: var(--text);
+    transition: border-color .15s; -webkit-appearance: none;
+  }
+  .cal-search-input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .cal-search-clear {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 15px; padding: 4px; line-height: 1;
+  }
+  .cal-search-results { margin-top: 10px; }
+  .cal-search-name-label {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    margin-bottom: 6px; display: flex; align-items: center; gap: 5px;
+  }
+  .cal-search-entry {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 7px 10px; border-radius: 8px; background: var(--bg);
+    margin-bottom: 4px; font-size: 12px;
+  }
+  .cal-search-range { font-weight: 500; color: var(--text); }
+  .cal-search-type  { color: var(--muted); }
+  .cal-no-result    { font-size: 13px; color: var(--muted); padding: 8px 0; }
+
+  /* ── 캘린더 툴팁 ── */
+  #cal-tooltip {
+    position: fixed; z-index: 400;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    min-width: 150px; max-width: 220px;
+    opacity: 0; pointer-events: none; transition: opacity .15s;
+  }
+  #cal-tooltip.on { opacity: 1; }
+  .cal-tip-date {
+    font-size: 11px; color: var(--muted); font-weight: 600;
+    margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  .cal-tip-person {
+    display: flex; align-items: center; gap: 7px;
+    padding: 4px 0; font-size: 13px; font-weight: 500;
+  }
+  .cal-tip-status { font-size: 11px; color: var(--muted); font-weight: 400; }
+
   /* ── PC 레이아웃 (768px 이상) ── */
+  @keyframes popIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
+
   @media (min-width: 768px) {
     body { padding-bottom: 0; }
 
@@ -214,17 +330,17 @@
     /* 하단 탭바 숨김 */
     .bottom-nav { display: none; }
 
-    /* 콘텐츠 영역 넓게 */
+    /* 콘텐츠 영역 3열 */
     .wrap {
-      max-width: 1080px;
+      max-width: 1200px;
       padding: 28px 40px 0;
       display: grid;
-      grid-template-columns: 380px 1fr;
+      grid-template-columns: 360px 1fr 280px;
       gap: 20px;
       align-items: start;
     }
 
-    /* 두 패널 모두 항상 표시 */
+    /* 세 패널 모두 항상 표시 */
     .tab-content { display: block !important; }
 
     /* 토스트는 화면 하단 고정 */
@@ -239,7 +355,6 @@
       padding-bottom: 32px;
       animation: popIn .2s ease;
     }
-    @keyframes popIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
     .modal-handle { display: none; }
 
     /* 버튼 hover 효과 */
@@ -248,6 +363,7 @@
     .btn-submit:hover  { opacity: .88; }
     .btn-cancel:hover  { background: var(--border); }
     .btn-confirm:hover { opacity: .88; }
+    .cal-arrow:active  { background: var(--bg); }
   }
 
   /* ── 비밀번호 게이트 ── */
@@ -366,6 +482,38 @@
     </div>
   </div>
 
+  <!-- 캘린더 탭 -->
+  <div class="tab-content" id="page-calendar">
+    <div class="card">
+      <div class="cal-search">
+        <input class="cal-search-input" type="text" id="cal-search-input"
+          placeholder="🔍 이름으로 검색..." oninput="onCalSearch(this.value)">
+        <button class="cal-search-clear" id="cal-search-clear"
+          onclick="clearCalSearch()" style="display:none">✕</button>
+      </div>
+      <div class="cal-header">
+        <button class="cal-arrow" onclick="prevMonth()">‹</button>
+        <span class="cal-month-title" id="cal-title"></span>
+        <button class="cal-arrow" onclick="nextMonth()">›</button>
+      </div>
+      <div class="cal-weekdays">
+        <div class="cal-wd">일</div>
+        <div class="cal-wd">월</div>
+        <div class="cal-wd">화</div>
+        <div class="cal-wd">수</div>
+        <div class="cal-wd">목</div>
+        <div class="cal-wd">금</div>
+        <div class="cal-wd">토</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><span class="cal-dot cal-dot-approved"></span> 승인</div>
+        <div class="cal-legend-item"><span class="cal-dot cal-dot-pending"></span> 대기중</div>
+      </div>
+      <div id="cal-search-results"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- 하단 네비게이션 -->
@@ -377,6 +525,10 @@
   <button class="bnav-item" id="nav-list" onclick="switchPage('list')">
     <span class="bnav-icon">📋</span>
     신청현황
+  </button>
+  <button class="bnav-item" id="nav-calendar" onclick="switchPage('calendar')">
+    <span class="bnav-icon">📅</span>
+    캘린더
   </button>
 </nav>
 
@@ -396,6 +548,7 @@
 </div>
 
 <div id="toast"></div>
+<div id="cal-tooltip"></div>
 
 <script>
 // =====================================================
@@ -414,17 +567,17 @@ function isPC() { return window.innerWidth >= 768; }
 
 function switchPage(page) {
   currentPage = page;
+  const pages = ['form', 'list', 'calendar'];
   if (isPC()) {
-    // PC: 두 패널 모두 항상 표시, 탭바만 상태 업데이트
-    document.getElementById('nav-form').classList.toggle('on', page === 'form');
-    document.getElementById('nav-list').classList.toggle('on', page === 'list');
+    pages.forEach(p => document.getElementById('nav-' + p).classList.toggle('on', p === page));
   } else {
-    document.getElementById('page-form').classList.toggle('on', page === 'form');
-    document.getElementById('page-list').classList.toggle('on', page === 'list');
-    document.getElementById('nav-form').classList.toggle('on', page === 'form');
-    document.getElementById('nav-list').classList.toggle('on', page === 'list');
+    pages.forEach(p => {
+      document.getElementById('page-' + p).classList.toggle('on', p === page);
+      document.getElementById('nav-' + p).classList.toggle('on', p === page);
+    });
   }
   if (page === 'list') renderList();
+  if (page === 'calendar') renderCalendar();
 }
 
 /* ── 필터 전환 ── */
@@ -474,7 +627,7 @@ async function loadData() {
   btn.classList.add('spinning');
   try {
     const res = await api({ action: 'getAll' });
-    if (res.ok) { allData = res.data; renderList(); updateCounts(); }
+    if (res.ok) { allData = res.data; renderList(); updateCounts(); renderCalendar(); }
     else toast('불러오기 실패');
   } catch { toast('네트워크 오류. 다시 시도해주세요.'); }
   btn.classList.remove('spinning');
@@ -621,6 +774,154 @@ async function confirmApprove() {
   closeModal();
 }
 
+
+/* ── 캘린더 ── */
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calSearchName = '';
+
+function getDatePeople(dateStr) {
+  return allData.filter(r => r.start_date <= dateStr && r.end_date >= dateStr)
+    .map(r => ({ name: r.user_name, status: r.status, type: r.type }));
+}
+
+function renderCalendar() {
+  const titleEl = document.getElementById('cal-title');
+  const grid = document.getElementById('cal-grid');
+  if (!titleEl || !grid) return;
+
+  titleEl.textContent = `${calYear}년 ${calMonth + 1}월`;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const todayStr = new Date().toISOString().substring(0, 10);
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const mm = String(calMonth + 1).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    const dateStr = `${calYear}-${mm}-${dd}`;
+    const people = getDatePeople(dateStr);
+    const isToday = dateStr === todayStr;
+    const dow = new Date(dateStr + 'T00:00:00').getDay();
+    const dowClass = dow === 0 ? 'sun' : dow === 6 ? 'sat' : '';
+
+    // 반려 제외한 dot만 표시
+    const statuses = [...new Set(people.filter(p => p.status !== 'rejected').map(p => p.status))];
+    const dots = statuses.map(s => `<span class="cal-dot cal-dot-${s}"></span>`).join('');
+
+    // 검색 하이라이트
+    const isSearched = calSearchName && people.some(p => p.name.includes(calSearchName));
+
+    html += `
+      <div class="cal-cell ${isToday ? 'today' : ''} ${people.length ? 'has-event' : ''} ${dowClass} ${isSearched ? 'searched' : ''}"
+           onmouseenter="showCalTooltip(event,'${dateStr}')"
+           onmouseleave="hideCalTooltip()">
+        <span class="cal-num">${d}</span>
+        ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
+      </div>
+    `;
+  }
+  grid.innerHTML = html;
+}
+
+function showCalTooltip(e, dateStr) {
+  const people = getDatePeople(dateStr);
+  if (!people.length) return;
+
+  // ✅ currentTarget을 RAF 이전에 동기적으로 캡처
+  const rect = e.currentTarget.getBoundingClientRect();
+
+  const tooltip = document.getElementById('cal-tooltip');
+  const labels = { pending: '대기중', approved: '승인', rejected: '반려' };
+  tooltip.innerHTML = `
+    <div class="cal-tip-date">${dateStr.replace(/-/g, '.')}</div>
+    ${people.map(p => `
+      <div class="cal-tip-person">
+        <span class="cal-dot cal-dot-${p.status}"></span>
+        ${p.name}<span class="cal-tip-status"> · ${labels[p.status]}</span>
+      </div>
+    `).join('')}
+  `;
+  tooltip.classList.add('on');
+
+  // 위치 계산 (동기적으로 처리)
+  const tw = tooltip.offsetWidth;
+  const th = tooltip.offsetHeight;
+  let left = rect.left + rect.width / 2 - tw / 2;
+  let top  = rect.bottom + 8;
+  if (left < 8) left = 8;
+  if (left + tw > window.innerWidth - 8) left = window.innerWidth - tw - 8;
+  if (top + th > window.innerHeight - 8) top = rect.top - th - 8;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top  = top + 'px';
+}
+
+function hideCalTooltip() {
+  document.getElementById('cal-tooltip').classList.remove('on');
+}
+
+function prevMonth() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function nextMonth() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+/* ── 캘린더 이름 검색 ── */
+function onCalSearch(value) {
+  calSearchName = value.trim();
+  document.getElementById('cal-search-clear').style.display = calSearchName ? 'block' : 'none';
+  renderCalendar();
+  renderCalSearchResults();
+}
+
+function clearCalSearch() {
+  document.getElementById('cal-search-input').value = '';
+  onCalSearch('');
+}
+
+function renderCalSearchResults() {
+  const el = document.getElementById('cal-search-results');
+  if (!calSearchName) { el.innerHTML = ''; return; }
+
+  const matched = allData.filter(r => r.user_name.includes(calSearchName))
+    .sort((a, b) => b.start_date.localeCompare(a.start_date));
+  if (!matched.length) {
+    el.innerHTML = '<div class="cal-no-result">검색 결과가 없습니다</div>';
+    return;
+  }
+
+  const labels = { pending: '대기중', approved: '승인', rejected: '반려' };
+
+  // 이름별 그룹핑
+  const grouped = {};
+  matched.forEach(r => {
+    if (!grouped[r.user_name]) grouped[r.user_name] = [];
+    grouped[r.user_name].push(r);
+  });
+
+  el.innerHTML = '<div style="height:12px"></div>' + Object.entries(grouped).map(([name, entries]) => `
+    <div class="cal-search-name-label">👤 ${name}</div>
+    ${entries.map(r => `
+      <div class="cal-search-entry">
+        <span class="cal-dot cal-dot-${r.status}"></span>
+        <span class="cal-search-range">${fmtRange(r.start_date, r.end_date)}</span>
+        <span class="cal-search-type">${r.type}</span>
+        <span class="badge badge-${r.status}" style="font-size:10px;padding:2px 7px;margin-left:auto">${labels[r.status]}</span>
+      </div>
+    `).join('')}
+  `).join('<div style="height:8px"></div>');
+}
 
 /* ── 비밀번호 게이트 ── */
 const PASSWORD = '0114';
